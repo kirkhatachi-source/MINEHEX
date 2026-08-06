@@ -1,0 +1,28 @@
+name: Build MINEHEX.dll
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install MinGW
+        run: |
+          choco install mingw -y
+          echo "C:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
+
+      - name: Compile DLL
+        run: |
+          g++ -shared -o MINEHEX.dll main.cpp ImGui\*.cpp -std=c++17 -ld3d11 -ldxgi -static-libgcc -static-libstdc++ -O2
+
+      - name: Upload DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: MINEHEX.dll
+          path: MINEHEX.dll
